@@ -1,6 +1,6 @@
 import axios from "axios";
 import { config } from "dotenv";
-
+import { countPlays } from "./utils";
 config();
 
 const instance = axios.create({
@@ -16,8 +16,8 @@ export async function fetchListeningHistory() {
   const res = await instance.post("submit_custom_query", {
     CustomQueryString: `SELECT *
 FROM PlaybackActivity 
-ORDER BY rowid DESC 
-LIMIT 30`,
+WHERE ItemType = 'Audio'
+ORDER BY rowid DESC `,
   });
 
   return res.data.results.map(
