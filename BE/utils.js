@@ -13,10 +13,3 @@ export function topListens(plays, num = 5) {
   }
   return res.sort((a, b) => b[1] - a[1]).slice(0, num);
 }
-/* 
-needs to order an object
-cant order objects
-collapse the object to a nested array of [songid, playcount]
-order the array by playcount 
-grab the first 20 / however many needed
-*/

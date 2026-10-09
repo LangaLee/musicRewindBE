@@ -1,5 +1,5 @@
 import { describe, expect } from "vitest";
-import { fetchListeningHistory } from "./app";
+import { fetchListeningHistory, fetchTopListens } from "./app";
 import { countPlays, topListens } from "./utils";
 
 describe("", () => {
@@ -18,6 +18,98 @@ describe("", () => {
         expect(typeof item.clientName).toBe("string");
         expect(typeof item.clientType).toBe("string");
         expect(typeof item.playbackDuration).toBe("number");
+      });
+    });
+  });
+
+  describe("fetchTopListens()", () => {
+    /* 
+    when passed an array with a single nested array ---done
+    when passed an array with multiple arrays inside it ----done
+    when passed an empty array ---- done
+    when passed an array with empty arrays inside ---- done
+    when passed an array with missing ids 
+    */
+    test("when passed an empty array", async () => {
+      const res = await fetchTopListens([]);
+      expect(res).toEqual([]);
+    });
+    test("when passed an array with a single item", async () => {
+      const input = [["439d28bae8a6e60dc46ee9a236185b84", 2]];
+      const expectedOutput = [
+        {
+          name: "NO BYSTANDERS (feat. Juice WRLD & Sheck Wes)",
+          itemId: "439d28bae8a6e60dc46ee9a236185b84",
+          playCount: expect.any(Number),
+          artistNames: ["Travis Scott"],
+          artistIds: ["709386787e02a9fce90d96229386c4ec"],
+          albumName: "ASTROWORLD",
+          albumId: "1865d012137d3e6f0665f4a9a050b970",
+          albumImageTag: "9681fbe4ca43d7873568953f49db7394",
+        },
+      ];
+
+      const res = await fetchTopListens(input);
+
+      expect(res).toEqual(expectedOutput);
+    });
+    test("when passed an array with mulultiple items", async () => {
+      const input = [
+        ["439d28bae8a6e60dc46ee9a236185b84", 5],
+        ["8d924b018a9c9cb60431a20d18f3033b", 5],
+        ["4ce290dc88a97a969e0c58d65422b1d5", 2],
+      ];
+      const expectedOutput = [
+        {
+          name: "NO BYSTANDERS (feat. Juice WRLD & Sheck Wes)",
+          itemId: "439d28bae8a6e60dc46ee9a236185b84",
+          playCount: expect.any(Number),
+          artistNames: ["Travis Scott"],
+          artistIds: ["709386787e02a9fce90d96229386c4ec"],
+          albumName: "ASTROWORLD",
+          albumId: "1865d012137d3e6f0665f4a9a050b970",
+          albumImageTag: "9681fbe4ca43d7873568953f49db7394",
+        },
+        {
+          name: "LVL",
+          itemId: "8d924b018a9c9cb60431a20d18f3033b",
+          playCount: expect.any(Number),
+          artistNames: ["A$AP Rocky"],
+          artistIds: ["fd0b05ff3e22749b9ebc6253056cdc0b"],
+          albumName: "LONG.LIVE.A$AP",
+          albumId: "34dcb9490baf15f7385c6e5727d0e575",
+          albumImageTag: "485eeeb5a4547b8ddea7753932084dfd",
+        },
+        {
+          name: "PMW (All I Really Need)",
+          itemId: "4ce290dc88a97a969e0c58d65422b1d5",
+          playCount: expect.any(Number),
+          artistNames: ["A$AP Rocky"],
+          artistIds: ["fd0b05ff3e22749b9ebc6253056cdc0b"],
+          albumName: "LONG.LIVE.A$AP",
+          albumId: "34dcb9490baf15f7385c6e5727d0e575",
+          albumImageTag: "485eeeb5a4547b8ddea7753932084dfd",
+        },
+      ];
+
+      const res = await fetchTopListens(input);
+      expect(res).toEqual(expectedOutput);
+    });
+    test("when passed an array with empty array inside", async () => {
+      const res = await fetchTopListens([[], [], [], []]);
+      expect(res).toEqual([]);
+    });
+    test("when passed an array with ids that dont exist in the db or in wrong format", async () => {
+      const res = await fetchTopListens([
+        [1],
+        ["null", 2],
+        ["banana", 2],
+        [],
+        [{}, 2],
+      ]);
+      expect(res).toEqual({
+        status: 400,
+        message: "one or more keys not found/invalid",
       });
     });
   });
